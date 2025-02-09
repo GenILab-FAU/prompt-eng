@@ -1,7 +1,7 @@
 import requests
 from typing import List, Tuple, Dict, Any
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import datetime, timezone
 from models import AIModel
 
 # interface for chatbot clients
@@ -24,7 +24,7 @@ class ChatbotClientFactory():
         # ollama client for now.
         if host == "chat.hpc.fau.edu":
             return OpenWebUIClient(host=host, bearer=config["bearer"])
-        # TODO : Implment Ollama client.
+        # TODO : Implement Ollama client.
         else:
             raise ValueError(f"Unknown host: {host}")
 
@@ -34,7 +34,11 @@ class OpenWebUIClient(ChatbotClient):
         self.host = host
         self.bearer = bearer
 
+    # TODO : Maybe considering making options a type, that way it can be validated and consistent
+    # between client implementations.
     def _parse_options(self, options: Dict[str, Any]) -> Dict[str, Any]:
+        """Filter out the options dict to only include the options that are implemented by this client."""
+
         implemented_options = {}
         for key, value in options.items():
             if key in {"temperature", "max_tokens"}:
@@ -43,6 +47,8 @@ class OpenWebUIClient(ChatbotClient):
         return implemented_options
 
     def _get_models(self) -> Dict[Any, Any]:
+        """Get the list of available models from the server."""
+
         url = f"https://{self.host}/api/models"
         headers = {
             "Authorization": f"Bearer {self.bearer}",
@@ -53,6 +59,8 @@ class OpenWebUIClient(ChatbotClient):
         return response.json()
     
     def get_models(self) -> List[AIModel]:
+        """Get the list of available models from the server."""
+
         data = self._get_models()
         models = []
         for model_info in data["data"]:
@@ -64,11 +72,12 @@ class OpenWebUIClient(ChatbotClient):
         return models
 
     def chat(self, message: str, model: AIModel, options: Dict[str, Any] = {}) -> Tuple[int, str]:
-        # deprecated time function, don't care
+        """Send a message to an LLM of your choice and get the response."""
+        
         parsed_options = self._parse_options(options)
-        start_time = datetime.utcnow()
+        start_time = datetime.now(timezone.utc)
         response_json = self._chat(message, model.name, parsed_options)
-        end_time = datetime.utcnow()
+        end_time = datetime.now(timezone.utc)
         time_elapsed_in_milliseconds = int((end_time - start_time).total_seconds() * 1000)
         
         # return first choice
@@ -79,6 +88,8 @@ class OpenWebUIClient(ChatbotClient):
                 return -1, str(exc)
 
     def _chat(self, message: str, model_name: str, options: Dict[str, Any] = {}):
+        """Send a chat request to the API and get the response."""
+
         headers = {"Authorization": f"Bearer {self.bearer}"}
         url = f"https://{self.host}/api/chat/completions"
         post_body = {
