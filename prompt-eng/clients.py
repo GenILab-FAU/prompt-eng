@@ -11,7 +11,7 @@ class ChatbotClient(ABC):
         pass
 
     @abstractmethod
-    def chat(self, message: str, model: AIModel, config: Dict[str, Any]) -> Tuple[int, str]:
+    def chat(self, message: str, model: AIModel, options: Dict[str, Any]) -> Tuple[int, str]:
         pass
 
 # instead of trying to make all the decisions in the client, we can use a factory to create the appropriate client based on the configuration.
@@ -34,6 +34,14 @@ class OpenWebUIClient(ChatbotClient):
         self.host = host
         self.bearer = bearer
 
+    def _parse_options(self, options: Dict[str, Any]) -> Dict[str, Any]:
+        implemented_options = {}
+        for key, value in options.items():
+            if key in {"temperature", "max_tokens"}:
+                implemented_options[key] = value
+        
+        return implemented_options
+
     def _get_models(self) -> Dict[Any, Any]:
         url = f"https://{self.host}/api/models"
         headers = {
@@ -55,11 +63,11 @@ class OpenWebUIClient(ChatbotClient):
             models.append(model)
         return models
 
-    def chat(self, message: str, model: AIModel, config: Dict[str, Any] = {}) -> Tuple[int, str]:
+    def chat(self, message: str, model: AIModel, options: Dict[str, Any] = {}) -> Tuple[int, str]:
         # deprecated time function, don't care
+        parsed_options = self._parse_options(options)
         start_time = datetime.utcnow()
-        # TODO: make config actually work
-        response_json = self._chat(message, model.name, config)
+        response_json = self._chat(message, model.name, parsed_options)
         end_time = datetime.utcnow()
         time_elapsed_in_milliseconds = int((end_time - start_time).total_seconds() * 1000)
         
@@ -70,7 +78,7 @@ class OpenWebUIClient(ChatbotClient):
             except Exception as exc:
                 return -1, str(exc)
 
-    def _chat(self, message: str, model_name: str, config: Dict[str, Any] = {}):
+    def _chat(self, message: str, model_name: str, options: Dict[str, Any] = {}):
         headers = {"Authorization": f"Bearer {self.bearer}"}
         url = f"https://{self.host}/api/chat/completions"
         post_body = {
@@ -80,6 +88,7 @@ class OpenWebUIClient(ChatbotClient):
                  "content": message},
             ]
         }
+        post_body.update(options)
         response = requests.post(url, json=post_body, headers=headers)
         response.raise_for_status()
         return response.json()
