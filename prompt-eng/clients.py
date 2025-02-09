@@ -19,7 +19,6 @@ class ChatbotClient(ABC):
 class ChatbotClientFactory():
     @staticmethod
     def create_client(config: Dict[str,str]) -> ChatbotClient:
-        print(config)
         host = config["chatbot_api_host"]
         # TODO : We'll simply decide using the FAU host, and consider anything else to be
         # ollama client for now.
