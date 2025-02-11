@@ -2,11 +2,10 @@ import requests
 from typing import List, Tuple, Dict, Any
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
-from models import AIModel
+from models import AIModel, ModelOptions
 from config import config_factory
-import random
 import logging
-import json
+
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +16,7 @@ class ChatbotClient(ABC):
         pass
 
     @abstractmethod
-    def chat(self, message: str, model: AIModel, options: Dict[str, Any]) -> Tuple[int, str]:
+    def chat_completion(self, message: str, model: AIModel, options: ModelOptions | None) -> Tuple[int, str]:
         pass
 
     def set_system_prompt(self, prompt: str) -> None:
@@ -54,14 +53,24 @@ class OpenWebUIClient(ChatbotClient):
 
     # TODO : Maybe considering making options a type, that way it can be validated and consistent
     # between client implementations.
-    def _parse_options(self, options: Dict[str, Any]) -> Dict[str, Any]:
-        """Filter out the options dict to only include the options that are implemented by this client."""
+    def _parse_options(self, options: ModelOptions | None) -> Dict[str, Any]:
+        """Parse the generic options type into params for the specific API"""
 
         implemented_options = {}
-        for key, value in options.items():
-            if key in {"temperature", "max_tokens"}:
-                implemented_options[key] = value
-        
+        options.validate()
+        if options.context_window_size:
+            implemented_options["num_ctx"] = options.context_window_size
+        if options.max_tokens:
+            implemented_options["max_tokens"] = options.max_tokens
+        if options.top_k:
+            implemented_options["top_k"] = options.top_k
+        if options.top_p:
+            implemented_options["top_p"] = options.top_p
+        if options.temperature:
+            implemented_options["temperature"] = options.temperature
+        if options.seed:
+            implemented_options["seed"] = options.seed
+
         return implemented_options
 
     def _get_models(self) -> Dict[Any, Any]:
@@ -89,12 +98,11 @@ class OpenWebUIClient(ChatbotClient):
             models.append(model)
         return models
 
-    def chat(self, message: str, model: AIModel, options: Dict[str, Any] = {}) -> Tuple[int, str]:
+    def chat_completion(self, message: str, model: AIModel, options: ModelOptions | None = None) -> Tuple[int, str]:
         """Send a message to an LLM of your choice and get the response."""
         
-        parsed_options = self._parse_options(options)
         start_time = datetime.now(timezone.utc)
-        response_json = self._chat(message, model.name, parsed_options)
+        response_json = self._chat(message, model.name, options)
         end_time = datetime.now(timezone.utc)
         time_elapsed_in_milliseconds = int((end_time - start_time).total_seconds() * 1000)
         
@@ -105,7 +113,7 @@ class OpenWebUIClient(ChatbotClient):
             except Exception as exc:
                 return -1, str(exc)
 
-    def _chat(self, message: str, model_name: str, options: Dict[str, Any] = {}):
+    def _chat(self, message: str, model_name: str, options: ModelOptions | None = None):
         """Send a chat request to the API and get the response."""
 
         headers = {"Authorization": f"Bearer {self._bearer}"}
@@ -118,7 +126,7 @@ class OpenWebUIClient(ChatbotClient):
             ]
         }
         
-        post_body.update(options)
+        post_body.update(self._parse_options(options) if options else {})
         if self._system_prompt:
             post_body["messages"] = [self._generate_system_message()] + post_body["messages"]
         response = requests.post(url, json=post_body, headers=headers)
@@ -130,7 +138,7 @@ class OllamaClient(ChatbotClient):
         self._host = host
         self._system_prompt = ""
 
-    def chat(self, message: str, model: AIModel, options: Dict[str, Any] = {}) -> Tuple[int, str]:
+    def chat_completion(self, message: str, model: AIModel, options: ModelOptions | None = None) -> Tuple[int, str]:
         """Send a chat request to the API and get the response."""
         start_time = datetime.now(timezone.utc)
         response = self._chat(message, model.name, options)
@@ -139,7 +147,7 @@ class OllamaClient(ChatbotClient):
         return time_taken_in_ms, response["message"]["content"]
 
 
-    def _chat(self, message: str, model_name: str, options: Dict[str, Any] = {}) -> Dict[str,str]:
+    def _chat(self, message: str, model_name: str, options: ModelOptions | None = None) -> Dict[str,str]:
         """Send a chat request to the API and get the response."""
         url = f"http://{self._host}/api/chat"
         post_body = {
@@ -152,7 +160,7 @@ class OllamaClient(ChatbotClient):
             ],
             "stream": False
         }
-        post_body.update(self._parse_options(options))
+        post_body.update(self._parse_options(options) if options else {})
         if self._system_prompt:
             post_body["messages"] = [self._generate_system_message()] + post_body["messages"]
         breakpoint()
@@ -160,21 +168,31 @@ class OllamaClient(ChatbotClient):
         response.raise_for_status()
         return response.json()
 
+    # reference https://github.com/ollama/ollama/blob/main/docs/modelfile.md#valid-parameters-and-values
+    def _parse_options(self, options: ModelOptions) -> None:
+        """Converts generic options into API specfic options"""
+        nested_options: Dict[str, Any] = {}
+        options.validate()
 
-    def _parse_options(self, options: Dict[str, Any]) -> None:
-        parsed_options={}
-        nested_options = {}
-        for key, value in options.items():
-            if key in ["max_tokens"]:
-                nested_options["num_predict"] = value
-            if key in ["temperature"]:
-                nested_options[key] = value
+        if options.max_tokens:
+            nested_options["num_predict"] = options.max_tokens
+        if options.temperature:
+            nested_options["temperature"] = options.temperature
+        if options.top_p:
+            nested_options["top_p"] = options.top_p
+        if options.seed:
+            nested_options["seed"] = options.seed
+        if options.top_k:
+            nested_options["top_k"] = options.top_k
+        if options.context_window_size:
+            nested_options["num_ctx"] = options.context_window_size
         if nested_options:
-            parsed_options["options"] = nested_options
-        return parsed_options
+            return {"options": nested_options}
+
+        return {}
    
     def get_models(self) -> List[AIModel]:  
-        """Get a list of available models."""
+        """Get a list of available models. API CALL"""
         data = self._get_models()
         return [AIModel(name=model["name"],parameter_size=model["details"]["parameter_size"]) for model in data["models"]]
 
@@ -190,24 +208,28 @@ class OllamaClient(ChatbotClient):
             self._system_prompt = prompt
         
 
-
-# this is just for ease of use, bootstraps the config and instantiates a model and a client
-def bootstrap_client_and_model(model: str) -> Tuple[ChatbotClient, AIModel]:
+def bootstrap_client_and_model(preferred_model: str = "") -> Tuple[ChatbotClient, AIModel]:
+    """Generic bootstrapper to load config, create client with factory, and provide a model
+        you can optionally provide a preferred model by providing it as the function arg"""
     config = config_factory()
     client = ChatbotClientFactory.create_client(config)
     models = client.get_models()
     fallback_model = _get_smallest_model(models)
     picked_model = None
     for modl in models:
-        if model == modl.name:
+        if preferred_model == modl.name:
             picked_model = modl
             break
-    if not picked_model:
-        logger.warning(f"Model {model} not found. Using fallback model of {fallback_model.name} instead.")
+    if not picked_model and preferred_model:
+        logger.warning(f"Model {preferred_model} not found. Using fallback model of {fallback_model.name} instead.")
         picked_model = fallback_model
+    picked_model = picked_model if picked_model else fallback_model
     return client, picked_model
 
 def _get_smallest_model(models: List[AIModel]):
+    """Get the smallest model in the list of models by parameter size"""
+    # TODO : Pretty sure this whole function could be a one liner.
+    # But would that be too expressive and hard to read?
     smallest = 9999999
     chosen_model = None
     for model in models:
