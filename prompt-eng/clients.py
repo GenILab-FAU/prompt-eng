@@ -34,17 +34,47 @@ class ChatbotClient(ABC):
 # instead of trying to make all the decisions in the client, we can use a factory to create the appropriate client based on the configuration.
 # this reduces the complexity of the client and makes it easier to add new clients in the future.
 class ChatbotClientFactory():
-    @staticmethod
-    def create_client(config: Dict[str,str]) -> ChatbotClient:
+    @classmethod
+    def create_client(cls, config: Dict[str,str]) -> ChatbotClient:
+        client_type = cls._detect_client_type(config)
         host = config["chatbot_api_host"]
         # TODO : We'll simply decide using the FAU host, and consider anything else to be
         # ollama client for now.
-        if host == "chat.hpc.fau.edu":
+        if client_type == "openwebui":
             return OpenWebUIClient(host=host, bearer=config["bearer"])
-        else:
+        elif client_type == "ollama":
             return OllamaClient(host=host)
-
+        else:
+            raise ValueError("could not autodetect client type.")
+    
+    @classmethod
+    def _detect_client_type(cls, config: Dict[str, str]):
         
+        # try ollama
+        url = f"http://{config["chatbot_api_host"]}/api/tags"
+        try:
+            ollama_resp = requests.get(url, timeout=1)
+            if ollama_resp.status_code == 200:
+                logger.info("autodetected ollama client")
+                return "ollama"
+        except Exception:
+            pass
+
+        # try openwebui
+        headers = {"Authorization": f"Bearer {config["bearer"]}"}
+        url = f"https://{config["chatbot_api_host"]}/api/models"
+        openwebui_resp = requests.get(url, headers=headers, timeout=1)
+        try:
+            data = openwebui_resp.json()
+            logger.info("autodetected openwebui client")
+            return "openwebui"
+        except Exception:
+            pass
+
+        return "unknown"
+        
+
+                  
 class OpenWebUIClient(ChatbotClient):
     def __init__(self, host: str, bearer: str):
         self._host = host
