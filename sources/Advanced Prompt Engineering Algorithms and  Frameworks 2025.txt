@@ -1,0 +1,216 @@
+﻿Deep Prompt Engineering: Advanced Prompting Algorithms for Large Language Models
+A Comprehensive Survey of Cutting-Edge Prompting Techniques for AI and Large Language Models
+Shaun Pritchard
+PhD, FAU College of Engineering and Computer Science
+Florida Atlantic University, Boca Raton, Florida
+Category 1: Foundational Prompting Approaches
+
+These methods represent the most classic or foundational strategies of using language models without heavy external augmentation or elaborate multi-step structures. They often revolve around zero-shot, one-shot, few-shot, in-context strategies, or instruction-based approaches. They focus primarily on how many examples or instructions are presented in the prompt, rather than employing complex reasoning chains or specialized memory systems.
+Zero-Shot Prompting
+One-Shot Prompting
+Few-Shot Prompting
+In-Context Learning (ICL)
+Instruction-Based Prompting
+Curriculum Learning-Based Prompting (CLBP)
+Prototype-Based Prompting (PBP)
+Instruction Tuning
+Exemplar-Based Prompting (EBP)
+Minimal Context Prompting (MCP)
+Topical Drift Mitigation Prompting (TDMP)
+Category 2: Chain-of-Thought and Other Reasoning-Focused Methods
+
+This group is dedicated to step-by-step, structured reasoning paradigms. It includes the broad family of “chain-of-thought” prompting, symbolic expansions, graph-based reasoning flows, tree-based decompositions, and related techniques that explicitly encourage the model to break down complex problems into intermediate steps.
+Least-to-Most Prompting
+Symbolic Chain-of-Thought (SymbCoT)
+Self-Consistency (SC) Prompting
+Graph-of-Thoughts (GoT)
+Chain-of-Verification (CoVe)
+Zero-Shot Chain-of-Thought (Zero-Shot CoT)
+Few-Shot Chain-of-Thought (Few-Shot CoT)
+Step-by-Step Reasoning (SBSR)
+Scaffolded CoT (SCoT)
+Tree-of-Thought (ToT)
+Reverse Chain-of-Thought (RCoT)
+Strategy-Switching Prompting (SSP)
+Multi-Turn Strategy Prompting (MTSP)
+Decision-Based Prompting (DBP)
+Chain-of-Thought Prompting (CoT)
+Chain-of-Reinforcement (CoR)
+Progressive Abstraction Prompting (PAP)
+Inverse Chain-of-Thought (ICoT)
+Analogical Reasoning Prompting (ARP)
+Layered Intention Prompting (LIP)
+Meta-Analytical Prompting (MAP)
+Category 3: Memory-Augmented and Retrieval-Based Approaches
+
+Methods here emphasize storing, retrieving, or dynamically updating context and knowledge to inform generation. They often incorporate external memory structures, retrieval systems, or episodic recall to augment the base language model, thereby improving long-term coherence or specialized knowledge usage.
+Dynamic Memory Networks (DMN)
+Buffer of Thoughts (BoT)
+POEM (PrOmpting with Episodic Memory)
+MemoryBank
+Self-Controlled Memory Framework
+Episodic Memory-Based Prompting
+RAG (Retrieval-Augmented Generation)
+MemoryBank (variant for long-term recall)
+Think-in-Memory (TiM)
+MemPrompt
+Memory-Augmented LLM (MALLM)
+Structured Memory Prompting (SMP)
+FAISS-Enhanced Prompting
+Memory-Aware Prompting (MAP)
+Knowledge-Augmented Retrieval Prompting (KARP)
+Task-Aware Memory Optimization (TAMO)
+Interactive Context Memory (ICM)
+Multi-Agent Memory Interaction Prompting (MAMIP)
+Memory Retrieval Augmentation (MRA)
+Structural Knowledge Retrieval (SKR)
+Memory-Sensitive Adaptive Prompting (MSAP)
+Context Segmentation and Fusion (CSF)
+Cross-Domain Memory Injection (CDMI)
+Context Preservation Prompting (CPP)
+Conditional Memory Recall Prompting (CMRP)
+Category 4: Tool Use, Multi-Agent Interaction, and External Integration
+
+In these methods, prompting strategies guide the language model to use external tools, coordinate with agent frameworks, or integrate specialized APIs. They may revolve around sending the model’s partial thoughts or requests to external systems (search engines, calculators, code interpreters) or orchestrating multiple agents.
+AgentKit
+Toolformer
+ReAct (Reasoning and Acting)
+Interaction-Guided Prompting (IGP)
+Program-Aided Language Models (PALM)
+Dual-Agent Interaction Prompting (DAIP)
+Task-Execution Augmented Prompting (TEAP)
+Interactive Context-Driven Prompting (ICDP)
+Modular Adaptive Prompting (MAP)
+Collaborative Prompting (CP)
+Interactive Schema Prompting (ISP)
+Function-Oriented Prompting (FOP)
+Category 5: Tuning, Parameter-Efficient Methods, and Prompt Optimization
+
+These techniques involve direct or indirect optimization of prompts or model parameters. They often reference prompt tuning, prefix tuning, or gradient-based methods for making the prompting process more robust or efficient without fully retraining the model.
+Gradient-Based Prompt Optimization (GBPO)
+Prompt Tuning (PT)
+Soft Prompting (SP)
+AutoPrompt
+Prefix Tuning
+Perplexity-Guided Prompting (PGP)
+Contrastive Prompting
+Dual Encoder Prompting (DEP)
+Active Learning Prompting (ALP)
+Parameter-Efficient Prompting (PEP)
+Prompt Pruning Optimization (PPO)
+Category 6: Planning, Task Decomposition, and Hierarchical Approaches
+
+Approaches here break tasks down into smaller sub-tasks or proceed through a structured plan. They often include hierarchical decomposition, goal stacking, or iterative expansions that help large language models tackle complex queries more systematically.
+Plan-and-Solve Plus (PS+)
+Task-Oriented Prompting (ToT)
+Experiential Learning Agents (ExpeL)
+Dual-Pathway Prompting
+Incremental Reasoning (IR)
+Hierarchical Task Decomposition
+Skill-Specific Prompting
+Recursive Memory Networks with Dual Process Handling
+Plan-and-Solve Prompting
+NeuroSolve-ACT (Proposed)
+Algorithmic Task Decomposition (ATD)
+Adaptive Chain Memory (ACM)
+Sequential Logic CoT
+Temporal Sequence Prompting
+Goal-Oriented Prompting (GOP)
+Autonomous Task Planner (ATP)
+NeuroPlanner Framework
+Cognitive Task Graphing (CTG)
+Contextual Expansion Prompting (CEP)
+Scenario Simulation Prompting (SSP)
+Decomposition-and-Recombination Prompting (DARP)
+Reinforcement-Prompted Learning (RPL)
+Task-Adaptive Prompting (TAP)
+Iterative Planning with Recursive Feedback (IPRF)
+Interleaved Reasoning and Acting (IRAct)
+Prompt Decomposition for Parallel Reasoning (PDPR)
+Temporal Pattern Recognition Prompting (TPRP)
+Category 7: Verification, Reflection, Critique, and Self-Regulation
+
+These methods emphasize checking or verifying intermediate or final answers, engaging in self-reflection, or critiquing outputs to improve correctness. They can involve meta-cognition, iterative feedback loops, adversarial testing, and refinements that push the model to re-evaluate its own responses.
+Skill-Centric Prompting (partially about focusing on correct skill usage, though sometimes also placed elsewhere)
+Critic-CoT
+System-1 Prompting with System-2 Override
+Self-Reflective Prompting (SRP)
+Layered Reasoning Prompting (LRP)
+Cognitive Loop Prompting (CLP)
+Reflective Prompting Architecture (RPA)
+Fact-Verification CoT
+Parallel CoT Reasoning (PCR)
+Deliberate Mistake Prompting (DMP)
+Interactive Feedback Loop Prompting (IFLP)
+Hypothesis-Guided Prompting (HGP)
+Adversarial Prompting (AP)
+Heuristic-Guided Prompting (HGP)
+Self-Distillation Prompting (SDP)
+Knowledge Injection Prompting (KIP)
+Active Perturbation Prompting (APP)
+Socratic Prompting
+Bias-Aware Prompting (BAP)
+Recursive Verification Prompting (RVP)
+Self-Supervised Critique Prompting (SSCP)
+Category 8: Multimodal and Cross-Lingual Prompting
+
+These focus on integrating different modalities (e.g., images, audio) or leveraging cross-lingual capabilities. They show how prompting extends beyond purely text-based inputs and outputs, either by unifying multiple data types or bridging multiple languages.
+Multimodal Chain-of-Thought (Multimodal-CoT)
+Multimodal Prompting (MP)
+Cross-Lingual Prompting (CLP)
+Category 9: Persona, Role-Based, and Skill-Oriented
+
+These methods highlight using specialized roles or personas in prompts, or focusing on distinct “skills” that the model can adopt. By setting a persona, skill profile, or role, the language model tailors its style and output structure to suit that perspective.
+Contextual-Aware Prompting (CAP) (partly about user role and context)
+Skill-Specific Prompting (listed also under planning, but it fits well here for skill dimension)
+Role-Based Instruction Prompting (RBIP)
+Persona-Based Prompting (PBP)
+Adaptive Role Play Prompting (ARPP)
+Category 10: Novel, Hybrid, or Less-Established Approaches
+
+Finally, many methods do not tie neatly into one of the more widely recognized families (chain-of-thought, memory augmentation, tuning, planning, verification, etc.). These appear to be emerging or proposed techniques that blend multiple elements or introduce new naming without widely recognized references. They often represent experimental frameworks that extend existing ideas in unique ways.
+PERFECT Framework
+NeuraACT (Novel Neuro-Inspired Recursive Action and Thought)
+Meta-Prompt Framework
+Situational Awareness Prompting (SAP)
+Knowledge Graph Reasoning (KGR)
+Insight-Derived Prompting (IDP)
+Functional Task Embedding Prompting (FTEP)
+Causal Inference Prompting (CIP)
+Prompt Chaining with Conditional Logic (PCCL)
+Dynamic Context Injection (DCI)
+Scenario Simulation Prompting (SSP) (also planning-related, but placed here for novelty)
+Goal-Driven Prompting (GDP)
+Temporal Context Awareness (TCA)
+Explicit Knowledge Injection (EKI)
+Goal-Oriented Reasoning Prompting (GORP)
+Information-Density Reduction Prompting (IDRP)
+Knowledge-Divergence Prompting (KDP)
+Prompt Cascading Framework (PCF)
+Parallel CoT Reasoning with Verification (PCR-V) (could fit in reasoning or verification, but is quite specialized)
+Layered Instruction Prompting (LIP) (distinct from #151’s usage)
+Iterative Planning with Recursive Feedback (IPRF) (duplicative mention in planning, but can appear novel for multiple expansions)
+Information Bottleneck Prompting (IBP)
+Rule-Guided Prompting (RGP)
+Cognitive Reflection Prompting (CRP)
+Entropy-Aware Prompting (EAP)
+Explanation-by-Example Prompting (EEBP)
+Simultaneous Contextual Integration (SCI)
+Uncertainty-Based Prompting (UBP)
+Hypothetical Scenario Generation (HSG)
+Knowledge Bridge Prompting (KBP)
+Self-Evolving Prompting (SEP)
+Tactile Prompting (TP)
+Causal Pathway Prompting (CPP)
+Comparative Judgment Prompting (CJP)
+Pragmatic Reasoning Prompting (PRP)
+Incremental Knowledge Distillation Prompting (IKDP)
+Language Task Transfer Prompting (LTTP)
+Attention-Guided Prompting (AGP)
+Progressive Task Complexity Prompting (PTCP)
+Schema-Guided Interaction Prompting (SGIP)
+Dialectic Reasoning Prompting (DRP)
+Goal-Stacked Prompting (GSP)
+Latent-Space Exploration Prompting (LSEP)
+Incremental Topic Expansion Prompting (ITEP)
+
