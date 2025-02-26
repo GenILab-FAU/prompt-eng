@@ -1,9 +1,9 @@
-# this is file: prompt-eng/config
+# this is file: prompt-eng/config.cfg
 # Point to the target Ollama or Open-WebUI Server
 # !!! YOU NEED TO ADJUST THE URL TO YOUR SERVER !!!
-# !!! IF USING OPEN-WEBUI, PROVIDE TEH API_KEY !!!
+# !!! IF USING OPEN-WEBUI, PROVIDE THE API_KEY !!!
 
-URL_GENERATE=http://localhost:11434/api/generate
-#URL_GENERATE=https://chat.hpc.fau.edu/api/chat/completions
-#API_KEY=
+CHATBOT_API_HOST=chat.hpc.fau.edu
+#CHATBOT_API_HOST=localhost:11434
+BEARER=MY_API_KEY
 
